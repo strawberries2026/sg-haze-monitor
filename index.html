@@ -135,12 +135,20 @@ function fit(){map.invalidateSize(false);map.fitBounds(bounds,{padding:[24,24],a
 
 // Keep third-party overlays and injected banners outside the map surface.
 function removeUnexpectedMapOverlays(){
- const allowed=new Set(['leaflet-pane','leaflet-control-container']);
- for(const child of [...el.children]){
-  if(child.classList.contains('leaflet-map-pane')||child.classList.contains('leaflet-control-container'))continue;
-  if(child.tagName==='IFRAME'||child.tagName==='INS'||child.tagName==='OBJECT'||child.tagName==='EMBED'||child.matches('[class*="advert"],[id*="advert"]'))child.remove();
+ // Leaflet should own the map surface. Remove injected non-Leaflet siblings
+ // without touching map tiles, markers, controls, or attribution.
+ const root=map.getContainer();
+ for(const node of [...root.children]){
+  if(node.classList.contains('leaflet-pane')||node.classList.contains('leaflet-map-pane')||node.classList.contains('leaflet-control-container'))continue;
+  node.remove();
  }
- for(const node of [...el.querySelectorAll('iframe,ins,object,embed,[class*="advert"],[id*="advert"]')])node.remove();
+ for(const node of [...root.querySelectorAll('iframe,ins,object,embed,[class*="advert"],[id*="advert"]')])node.remove();
+ for(const pane of root.querySelectorAll('.leaflet-tile-pane,.leaflet-marker-pane,.leaflet-overlay-pane,.leaflet-shadow-pane')){
+  for(const node of [...pane.children]){
+   if(node.classList.contains('leaflet-layer')||node.classList.contains('leaflet-marker-icon')||node.classList.contains('leaflet-marker-shadow')||node.classList.contains('leaflet-zoom-animated')||node.tagName==='SVG')continue;
+   node.remove();
+  }
+ }
 }
 new MutationObserver(removeUnexpectedMapOverlays).observe(el,{childList:true,subtree:true});
 removeUnexpectedMapOverlays();
