@@ -142,11 +142,14 @@ loadWeatherOutlook();setInterval(loadWeatherOutlook,30*60*1000);
  const key='hccc-haze-alert-config';
  try{const saved=JSON.parse(localStorage.getItem(key)||'{}');toggle.checked=!!saved.enabled;if([100,200,300].includes(Number(saved.threshold)))threshold.value=String(saved.threshold)}catch(e){}
  let previousAbove=false;
+ let lastReadingSignature='';
  function check(){const enabled=toggle.checked,limit=Number(threshold.value);try{localStorage.setItem(key,JSON.stringify({enabled,threshold:limit}))}catch(e){}
  if(!enabled){status.textContent='Alerts are off.';previousAbove=false;return}
  const values=typeof currentPsi!=='undefined'?currentPsi:null;
- if(!values){status.textContent='Waiting for an official PSI reading.';return}
+ if(!values){status.textContent='Waiting for an official PSI reading.';previousAbove=false;lastReadingSignature='';return}
  const matches=['north','south','east','west','central'].filter(region=>Number.isFinite(values[region])&&values[region]>limit);
+ const signature=['north','south','east','west','central'].map(region=>values[region]).join('|')+'@'+limit;
+ if(signature!==lastReadingSignature){previousAbove=false;lastReadingSignature=signature}
  if(matches.length){status.textContent='PSI threshold exceeded: '+matches.map(region=>region[0].toUpperCase()+region.slice(1)+' '+values[region]).join(', ')+'.';if(!previousAbove&&'vibrate' in navigator)navigator.vibrate(180);previousAbove=true}
  else{status.textContent='No region currently exceeds PSI '+limit+'.';previousAbove=false}
  }
