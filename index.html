@@ -152,6 +152,10 @@ async function loadWeatherOutlook(){
   const valid=item.validPeriod||item.valid_period||data.validPeriod||{};
   const stamp=valid.start||item.updateTimestamp||item.timestamp||'';
   if(!forecast.trim())throw Error('No verified weather forecast text');
+  // The forecast's valid-from time is source metadata, not the time of this fetch.
+  // Reject a forecast that started over 24 hours ago instead of labelling it current.
+  const issuedMs=stamp?Date.parse(stamp):NaN;
+  if(Number.isFinite(issuedMs)&&Date.now()-issuedMs>24*60*60*1000)throw Error('Weather forecast validity has expired');
   lastVerifiedWeather={forecast:forecast.trim(),stamp,checked:new Date()};
   el.textContent='Official NEA 24-hour weather outlook: '+lastVerifiedWeather.forecast+(stamp?' · Valid from: '+stamp:'')+'. This is not a PSI forecast.';
   if(status)status.textContent='Last successful retrieval: '+new Intl.DateTimeFormat('en-SG',{timeZone:'Asia/Singapore',dateStyle:'medium',timeStyle:'short'}).format(lastVerifiedWeather.checked)+' SGT.';
@@ -160,7 +164,8 @@ async function loadWeatherOutlook(){
    el.textContent='Weather service temporarily unavailable. Last successfully retrieved outlook (may be outdated): '+lastVerifiedWeather.forecast+(lastVerifiedWeather.stamp?' · Valid from: '+lastVerifiedWeather.stamp:'')+'. This is not a PSI forecast.';
    if(status)status.textContent='Last successful retrieval: '+new Intl.DateTimeFormat('en-SG',{timeZone:'Asia/Singapore',dateStyle:'medium',timeStyle:'short'}).format(lastVerifiedWeather.checked)+' SGT. Weather service currently unavailable; showing potentially outdated data. Check NEA for updates.';
   }else{
-   el.textContent='Official 24-hour weather outlook could not be loaded. Check NEA directly for current weather. Next-day PSI forecasts are published separately on haze.gov.sg during haze periods.';
+   el.textContent='Official 24-hour weather outlook could not be verified. Check NEA directly for current weather. Next-day PSI forecasts are published separately on haze.gov.sg during haze periods.';
+   if(status)status.textContent='No successful, current weather update this session. Use the official NEA weather source.';
   }
  }finally{if(retry)retry.disabled=false;}
 }
