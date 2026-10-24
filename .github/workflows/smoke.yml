@@ -1,0 +1,16 @@
+name: Haze monitor smoke tests
+on:
+  push:
+    branches: [main, review/haze-enhancements-20261024]
+  pull_request:
+    branches: [main]
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate app scripts and feature safeguards
+        run: node tests/smoke.cjs
