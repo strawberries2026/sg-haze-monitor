@@ -114,9 +114,9 @@ async function loadWeatherOutlook(){
   const records=Array.isArray(data.records)?data.records:Array.isArray(data.items)?data.items:[];
   const item=records[0]||data;
   const general=item.general||{};
-  const forecast=general.forecast||item.forecast||data.general?.forecast;
-  const valid=item.validPeriod||item.valid_period||data.validPeriod||{};
-  const stamp=valid.start||item.updateTimestamp||item.timestamp||'';
+  const rawForecast=general.forecast||item.forecast||data.general?.forecast;const forecast=typeof rawForecast==='string'?rawForecast:rawForecast?.text;
+  const valid=general.validPeriod||item.validPeriod||item.valid_period||data.validPeriod||{};
+  const stamp=valid.start||item.updatedTimestamp||item.updateTimestamp||item.timestamp||'';
   if(typeof forecast!=='string'||!forecast.trim())throw Error('No verified weather forecast text');
   el.textContent='Official NEA 24-hour weather outlook: '+forecast.trim()+(stamp?' · Valid from: '+stamp:'')+'. This is not a PSI forecast.';
  }catch(e){
