@@ -17,3 +17,13 @@ assert.match(html, /No verified next-day PSI forecast/, 'Planner must not invent
 assert.match(html, /background push alerts require a separate notification service/, 'Alert limitations must be disclosed');
 assert.match(html, /not a PSI forecast/i, 'Weather must be distinguished from PSI forecast');
 console.log('PASS: inline JavaScript syntax and haze feature safety checks');
+
+for(const id of ['psiTrendInsight','pmTrendInsight']) assert.ok(html.includes('id="'+id+'"'), 'Missing trend insight '+id);
+assert.match(html, /AbortSignal\.timeout\(12000\)/, 'Network requests must have timeouts');
+assert.match(html, /rel="manifest"/, 'PWA manifest must be linked');
+assert.match(html, /\.v47-c\{left:50%;top:54%\}/, 'Central marker must align with north');
+assert.match(html, /\.v47-s\{left:50%;top:69%\}/, 'South marker must align with north');
+const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
+assert.equal(manifest.display,'standalone');
+assert.ok(fs.existsSync('icon.svg'));
+console.log('PASS: PWA assets, marker alignment, trend insights and network timeouts');
