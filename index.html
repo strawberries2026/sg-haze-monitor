@@ -238,7 +238,7 @@ loadWeatherOutlook();setInterval(loadWeatherOutlook,30*60*1000);
  function check(){const enabled=toggle.checked,limit=Number(threshold.value);try{localStorage.setItem(key,JSON.stringify({enabled,threshold:limit}))}catch(e){}
  if(!enabled){status.textContent='Alerts are off.';previousAbove=false;return}
  const values=typeof currentPsi!=='undefined'&&lastPsiWasLive?currentPsi:null;
- if(!values){status.textContent='Live PSI unavailable. Waiting for an official reading; saved readings are not used to trigger alerts.';previousAbove=false;lastReadingSignature='';return}
+ if(!values){const saved=typeof currentPsi!=='undefined'?currentPsi:null;const regions=['north','south','east','west','central'];const found=saved?regions.filter(region=>Number.isFinite(saved[region])&&saved[region]>limit):[];status.textContent=saved?(found.length?'Saved PSI reading (not live): '+found.map(region=>region[0].toUpperCase()+region.slice(1)+' '+saved[region]).join(', ')+' exceeded PSI '+limit+'. No live alert triggered; check NEA for current readings.':'Saved PSI reading (not live): no region exceeded PSI '+limit+' when last recorded. No live alert triggered; check NEA for current readings.'):'Live PSI unavailable. Waiting for an official reading. No live alert triggered.';previousAbove=false;lastReadingSignature='';return}
  const matches=['north','south','east','west','central'].filter(region=>Number.isFinite(values[region])&&values[region]>limit);
  const signature=['north','south','east','west','central'].map(region=>values[region]).join('|')+'@'+limit;
  if(signature!==lastReadingSignature){previousAbove=false;lastReadingSignature=signature}
