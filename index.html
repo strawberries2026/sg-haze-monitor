@@ -158,7 +158,7 @@ async function loadWeatherOutlook(){
  }catch(e){
   if(lastVerifiedWeather){
    el.textContent='Weather service temporarily unavailable. Last successfully retrieved outlook (may be outdated): '+lastVerifiedWeather.forecast+(lastVerifiedWeather.stamp?' · Valid from: '+lastVerifiedWeather.stamp:'')+'. This is not a PSI forecast.';
-   if(status)status.textContent='Showing previously retrieved data; check NEA for the latest conditions.';
+   if(status)status.textContent='Last successful retrieval: '+new Intl.DateTimeFormat('en-SG',{timeZone:'Asia/Singapore',dateStyle:'medium',timeStyle:'short'}).format(lastVerifiedWeather.checked)+' SGT. Weather service currently unavailable; showing potentially outdated data. Check NEA for updates.';
   }else{
    el.textContent='Official 24-hour weather outlook could not be loaded. Check NEA directly for current weather. Next-day PSI forecasts are published separately on haze.gov.sg during haze periods.';
   }
