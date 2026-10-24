@@ -108,15 +108,20 @@ async function loadWeatherOutlook(){
  const el=document.getElementById('weatherOutlook');if(!el)return;
  try{
   const res=await fetch('https://api-open.data.gov.sg/v2/real-time/api/twenty-four-hr-forecast',{cache:'no-store'});
-  if(!res.ok)throw Error('Weather feed unavailable');
-  const json=await res.json();const d=json.data||{};
-  const item=(d.records&&d.records[0])||(d.items&&d.items[0])||d;
-  const general=item.general||{};const f=general.forecast||item.forecast;
-  const valid=item.validPeriod||item.valid_period||{};
+  if(!res.ok)throw Error('Weather feed HTTP '+res.status);
+  const json=await res.json();
+  const data=json.data||{};
+  const records=Array.isArray(data.records)?data.records:Array.isArray(data.items)?data.items:[];
+  const item=records[0]||data;
+  const general=item.general||{};
+  const forecast=general.forecast||item.forecast||data.general?.forecast;
+  const valid=item.validPeriod||item.valid_period||data.validPeriod||{};
   const stamp=valid.start||item.updateTimestamp||item.timestamp||'';
-  if(typeof f!=='string'||!f.trim())throw Error('No verified forecast text');
-  el.textContent='Official NEA 24-hour weather outlook: '+f+(stamp?' · Issued/valid from: '+stamp:'')+'. Not a PSI forecast.';
- }catch(e){el.textContent='Official weather outlook unavailable. Check NEA directly. The next-day PSI forecast is available on haze.gov.sg when published.'}
+  if(typeof forecast!=='string'||!forecast.trim())throw Error('No verified weather forecast text');
+  el.textContent='Official NEA 24-hour weather outlook: '+forecast.trim()+(stamp?' · Valid from: '+stamp:'')+'. This is not a PSI forecast.';
+ }catch(e){
+  el.textContent='Official 24-hour weather outlook could not be loaded. Check NEA directly for current weather. Next-day PSI forecasts are published separately on haze.gov.sg during haze periods.';
+ }
 }
 loadWeatherOutlook();setInterval(loadWeatherOutlook,30*60*1000);
 </script><script>
