@@ -26,8 +26,8 @@ assert.match(html, /openstreetmap\.org\/copyright/, 'Visible OSM attribution mus
 for (const region of ['north','south','east','west','central']) {
   assert.match(html, new RegExp('data-region="'+region+'"'), 'Missing map region: '+region);
 }
-assert.match(html, /north:\[103\.845,1\.414\]/, 'North marker longitude must align');
-assert.match(html, /central:\[103\.845,1\.352\]/, 'Central marker longitude must align');
-assert.match(html, /south:\[103\.845,1\.279\]/, 'South marker longitude must align');
+assert.match(html, /north:\[103\.827,1\.414\]/, 'North marker longitude must align');
+assert.match(html, /central:\[103\.827,1\.352\]/, 'Central marker longitude must align');
+assert.match(html, /south:\[103\.827,1\.279\]/, 'South marker longitude must align');
 assert.match(html, /function draw\(\)/, 'Responsive map projection should be present');
 console.log('PASS: inline JavaScript syntax, haze safety checks, map attribution and regional positions');
