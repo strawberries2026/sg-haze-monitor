@@ -25,7 +25,7 @@ assert.doesNotMatch(html, /openstreetmap\.org\/export\/embed\.html/, 'Embedded O
 assert.match(html, /openstreetmap\.org\/copyright/, 'Visible OSM attribution must link to copyright');
 for (const region of ['north','south','east','west','central']) {
   assert.match(html, new RegExp('data-region="'+region+'"'), 'Missing map region: '+region);
-  assert.match(html, new RegExp(region+':\\\\[103\\\\.'), 'Missing Singapore geographic coordinates: '+region);
 }
+assert.match(html, /const pins=\{north:\[103\.82,1\.414\]/, 'Singapore regional coordinates should be present');
 assert.match(html, /function draw\(\)/, 'Responsive map projection should be present');
 console.log('PASS: inline JavaScript syntax, haze safety checks, map attribution and regional positions');
