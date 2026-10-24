@@ -179,18 +179,54 @@ loadWeatherOutlook();setInterval(loadWeatherOutlook,30*60*1000);
 (function(){
  const el=document.getElementById('hccc-geo-map');
  if(!el)return;
- // Isolate the map in its own document to prevent host-page styles and
- // injected tile elements from obscuring regional readings.
- const frame=document.createElement('iframe');
- frame.title='OpenStreetMap Singapore street map';
- frame.loading='lazy';
- frame.referrerPolicy='no-referrer-when-downgrade';
- frame.setAttribute('aria-label','Singapore street map');
- frame.src='https://www.openstreetmap.org/export/embed.html?bbox=103.64%2C1.245%2C104.035%2C1.405&layer=mapnik';
- frame.style.cssText='width:100%;height:100%;border:0;display:block;filter:none;pointer-events:none';
- el.replaceChildren(frame);
- const pins=document.querySelector('.v47-pins');
- if(pins){pins.style.setProperty('display','block','important');pins.style.zIndex='5';}
+ // Fixed Singapore bounding box, matching the markers' projected coordinates.
+ // Render tiles directly to avoid the third-party embedded site's donation UI.
+ const bbox={west:103.60,east:104.05,south:1.225,north:1.475};
+ const pins={north:[103.82,1.414],west:[103.705,1.350],central:[103.825,1.319],east:[103.945,1.347],south:[103.847,1.276]};
+ const map=el.closest('.v47-map');
+ const overlay=document.createElement('div');
+ overlay.className='hccc-map-tiles';
+ overlay.setAttribute('aria-hidden','true');
+ el.replaceChildren(overlay);
+ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+ const mercY=lat=>(1-Math.log(Math.tan(lat*Math.PI/180)+1/Math.cos(lat*Math.PI/180))/Math.PI)/2;
+ function draw(){
+  const width=el.clientWidth,height=el.clientHeight;
+  if(!width||!height)return;
+  const zoom=10,tile=256,n=Math.pow(2,zoom);
+  const x=lon=>(lon+180)/360*n*tile;
+  const y=lat=>mercY(lat)*n*tile;
+  const left=x(bbox.west),right=x(bbox.east),top=y(bbox.north),bottom=y(bbox.south);
+  const scale=Math.min(width/(right-left),height/(bottom-top));
+  const cx=(left+right)/2,cy=(top+bottom)/2;
+  overlay.replaceChildren();
+  const xmin=Math.floor((cx-width/(2*scale))/tile),xmax=Math.ceil((cx+width/(2*scale))/tile);
+  const ymin=Math.floor((cy-height/(2*scale))/tile),ymax=Math.ceil((cy+height/(2*scale))/tile);
+  for(let tx=xmin;tx<=xmax;tx++)for(let ty=ymin;ty<=ymax;ty++){
+   if(tx<0||tx>=n||ty<0||ty>=n)continue;
+   const img=document.createElement('img');
+   img.alt='';img.loading='lazy';img.decoding='async';
+   img.src='https://tile.openstreetmap.org/'+zoom+'/'+tx+'/'+ty+'.png';
+   img.style.cssText='position:absolute;max-width:none;width:'+(tile*scale)+'px;height:'+(tile*scale)+'px;left:'+(width/2+(tx*tile-cx)*scale)+'px;top:'+(height/2+(ty*tile-cy)*scale)+'px';
+   overlay.appendChild(img);
+  }
+  for(const [region,[lon,lat]] of Object.entries(pins)){
+   const button=map.querySelector('.v47-pin[data-region="'+region+'"]');
+   if(!button)continue;
+   button.style.left=clamp(100*(width/2+(x(lon)-cx)*scale)/width,9,91)+'%';
+   button.style.top=clamp(100*(height/2+(y(lat)-cy)*scale)/height,12,88)+'%';
+  }
+ }
+ const style=document.createElement('style');
+ style.textContent='.hccc-map-tiles{position:absolute;inset:0;overflow:hidden;pointer-events:none}.hccc-map-tiles img{border:0;pointer-events:none}.v47-map{isolation:isolate}.v47-pins{z-index:2}.hccc-map-attribution{position:absolute;left:4px;bottom:4px;z-index:3;background:#fffE;color:#173044;font-size:11px;line-height:1.4;padding:3px 5px;border-radius:4px}.hccc-map-attribution a{color:#145879;text-decoration:underline}';
+ document.head.appendChild(style);
+ const attribution=document.createElement('div');
+ attribution.className='hccc-map-attribution';
+ attribution.innerHTML='© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>';
+ map.appendChild(attribution);
+ draw();
+ if(typeof ResizeObserver!=='undefined')new ResizeObserver(draw).observe(el);
+ else window.addEventListener('resize',draw);
 })();
 </script><script>
 (function(){

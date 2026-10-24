@@ -20,4 +20,12 @@ assert.match(html, /function isDatedPsiForecastCurrent\(\)/, 'Gauge must check c
 assert.match(html, /id="datedForecastGaugeValue"/, 'Dated forecast gauge must exist');
 assert.match(html, /background push alerts require a separate notification service/, 'Alert limitations must be disclosed');
 assert.match(html, /not a PSI forecast/i, 'Weather must be distinguished from PSI forecast');
-console.log('PASS: inline JavaScript syntax and haze feature safety checks');
+assert.match(html, /tile\.openstreetmap\.org/, 'Map should use direct OSM tiles');
+assert.doesNotMatch(html, /openstreetmap\.org\/export\/embed\.html/, 'Embedded OSM map must not return');
+assert.match(html, /openstreetmap\.org\/copyright/, 'Visible OSM attribution must link to copyright');
+for (const region of ['north','south','east','west','central']) {
+  assert.match(html, new RegExp('data-region="'+region+'"'), 'Missing map region: '+region);
+}
+assert.match(html, /const pins=\{north:\[103\.82,1\.414\]/, 'Singapore regional coordinates should be present');
+assert.match(html, /function draw\(\)/, 'Responsive map projection should be present');
+console.log('PASS: inline JavaScript syntax, haze safety checks, map attribution and regional positions');
