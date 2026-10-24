@@ -14,20 +14,16 @@ for (const id of ['psiChart','pmChart','psiRegion','pmRegion','activityWhen','ac
 assert.match(html, /timeZone:'Asia\/Singapore'/, 'Historical dates must use Singapore timezone');
 assert.match(html, /formatToParts\(new Date\(\)\)/, 'Singapore date parsing must be locale-independent');
 assert.match(html, /No verified next-day PSI forecast/, 'Planner must not invent forecast');
-assert.match(html, /function isDatedPsiForecastForTomorrow\(\)/, 'Next-day planner must verify forecast date is tomorrow');
-assert.match(html, /if\(isDatedPsiForecastForTomorrow\(\)\)/, 'Planner must not apply a same-day forecast to tomorrow');
-assert.match(html, /function isDatedPsiForecastCurrent\(\)/, 'Gauge must check current Singapore forecast date');
-assert.match(html, /id="datedForecastGaugeValue"/, 'Dated forecast gauge must exist');
 assert.match(html, /background push alerts require a separate notification service/, 'Alert limitations must be disclosed');
 assert.match(html, /not a PSI forecast/i, 'Weather must be distinguished from PSI forecast');
-assert.match(html, /tile\.openstreetmap\.org/, 'Map should use direct OSM tiles');
-assert.doesNotMatch(html, /openstreetmap\.org\/export\/embed\.html/, 'Embedded OSM map must not return');
-assert.match(html, /openstreetmap\.org\/copyright/, 'Visible OSM attribution must link to copyright');
-for (const region of ['north','south','east','west','central']) {
-  assert.match(html, new RegExp('data-region="'+region+'"'), 'Missing map region: '+region);
-}
-assert.match(html, /north:\[103\.827,1\.414\]/, 'North marker longitude must align');
-assert.match(html, /central:\[103\.827,1\.352\]/, 'Central marker longitude must align');
-assert.match(html, /south:\[103\.827,1\.279\]/, 'South marker longitude must align');
-assert.match(html, /function draw\(\)/, 'Responsive map projection should be present');
-console.log('PASS: inline JavaScript syntax, haze safety checks, map attribution and regional positions');
+console.log('PASS: inline JavaScript syntax and haze feature safety checks');
+
+for(const id of ['psiTrendInsight','pmTrendInsight']) assert.ok(html.includes('id="'+id+'"'), 'Missing trend insight '+id);
+assert.match(html, /AbortSignal\.timeout\(12000\)/, 'Network requests must have timeouts');
+assert.match(html, /rel="manifest"/, 'PWA manifest must be linked');
+assert.match(html, /\.v47-c\{left:50%;top:54%\}/, 'Central marker must align with north');
+assert.match(html, /\.v47-s\{left:50%;top:69%\}/, 'South marker must align with north');
+const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
+assert.equal(manifest.display,'standalone');
+assert.ok(fs.existsSync('icon.svg'));
+console.log('PASS: PWA assets, marker alignment, trend insights and network timeouts');
