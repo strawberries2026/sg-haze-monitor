@@ -126,15 +126,19 @@ function showDatedPsiForecast(){
   el.textContent='No verified current next-day PSI forecast is connected. The previously published 24 Oct 2026 forecast was 90–140 and is now historical. Check haze.gov.sg for the latest dated forecast.';
  }
 }
-showDatedPsiForecast();
-(function(){
+function refreshDatedPsiForecastDisplay(){
+ showDatedPsiForecast();
  const active=isDatedPsiForecastCurrent();
  const value=document.getElementById('datedForecastGaugeValue'),caption=document.getElementById('datedForecastGaugeCaption');
- if(value&&caption&&active){value.textContent='90–140';caption.textContent='NEA · 24 Oct 2026';}
+ if(value)value.textContent=active?'90–140':'Not available';
+ if(caption)caption.textContent=active?'NEA · 24 Oct 2026':'Check NEA for official range';
  const note=document.getElementById('forecastAvailability');
- if(note&&active)note.textContent='Today’s published NEA PSI forecast (24 Oct 2026): 90–140 (Moderate to Unhealthy). Not valid for tomorrow (25 Oct). Dated forecast, not a live reading; check NEA for updates.';
+ if(note)note.textContent=active?'Today’s published NEA PSI forecast (24 Oct 2026): 90–140 (Moderate to Unhealthy). Not valid for tomorrow (25 Oct). Dated forecast, not a live reading; check NEA for updates.':'No verified PSI forecast for today or tomorrow is connected. The 24 Oct 2026 forecast is historical; check NEA for the latest published range and date.';
  updateActivityPlanner();
-})();
+}
+refreshDatedPsiForecastDisplay();
+// Keep the displayed forecast date accurate if the page remains open across midnight in Singapore.
+setInterval(refreshDatedPsiForecastDisplay,60*1000);
 
 let lastVerifiedWeather=null;
 async function loadWeatherOutlook(){
