@@ -1,6 +1,6 @@
 {
-  "name": "HCCC Haze Monitor",
-  "short_name": "HCCC Haze",
+  "name": "SG Haze Monitor",
+  "short_name": "SG Haze",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
