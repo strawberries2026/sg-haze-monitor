@@ -30,10 +30,10 @@ console.log('PASS: PWA assets, marker alignment, trend insights and network time
 
 // Lightweight security regression checks for the public static website.
 assert.match(html, /<meta name="referrer" content="strict-origin-when-cross-origin">/, 'Referrer policy must be present');
-for (const anchor of html.matchAll(/<a\\b[^>]*target="_blank"[^>]*>/gi)) {
+for (const anchor of html.matchAll(/<a\b[^>]*target="_blank"[^>]*>/gi)) {
   assert.match(anchor[0], /rel="[^"]*noopener/, 'External tab link missing noopener');
   assert.match(anchor[0], /rel="[^"]*noreferrer/, 'External tab link missing noreferrer');
 }
 assert.doesNotMatch(html, /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9_]{20,}|AIza[0-9A-Za-z_-]{25,}/, 'Possible embedded credential in HTML');
-assert.doesNotMatch(html, /\\beval\\s*\\(|\\bnew\\s+Function\\s*\\(/, 'Dynamic code execution is not permitted');
+assert.doesNotMatch(html, /\beval\s*\(|\bnew\s+Function\s*\(/, 'Dynamic code execution is not permitted');
 console.log('PASS: referrer policy, external links and basic frontend security checks');
