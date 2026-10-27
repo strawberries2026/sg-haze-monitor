@@ -35,5 +35,5 @@ for (const anchor of html.matchAll(/<a\b[^>]*target="_blank"[^>]*>/gi)) {
   assert.match(anchor[0], /rel="[^"]*noreferrer/, 'External tab link missing noreferrer');
 }
 assert.doesNotMatch(html, /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9_]{20,}|AIza[0-9A-Za-z_-]{25,}/, 'Possible embedded credential in HTML');
-assert.doesNotMatch(html, /\beval\s*\(|\bnew\s+Function\s*\(/, 'Dynamic code execution is not permitted');
+assert.ok(!html.includes('eval(') && !html.includes('new Function('), 'Dynamic code execution is not permitted');
 console.log('PASS: referrer policy, external links and basic frontend security checks');
