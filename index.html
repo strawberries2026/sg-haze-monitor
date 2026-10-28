@@ -552,18 +552,27 @@ const names={north:'North',south:'South',east:'East',west:'West',central:'Centra
 const set=(id,value)=>{const el=document.getElementById(id);if(el&&el.textContent!==value)el.textContent=value};
 function update(){
 const state=window.hcccPsiAlertState||{},psi=state.values||{},pins=[...document.querySelectorAll('.v47-pin')];
-const read=(r,kind)=>{const pin=pins.find(p=>p.dataset.region===r);if(!pin)return null;const col=pin.querySelector(kind==='pm'?'.pin-dual>span:first-child b':'.pin-dual>span:last-child b');const n=Number(col?.textContent?.trim());return col&&col.textContent.trim()!=='—'&&Number.isFinite(n)?n:null};
-const best=(kind)=>{const a=regions.map(r=>({r,v:kind==='psi'&&Number.isFinite(psi[r])?psi[r]:read(r,kind)})).filter(x=>Number.isFinite(x.v));if(!a.length)return null;const m=Math.max(...a.map(x=>x.v));return {v:m,regions:a.filter(x=>x.v===m).map(x=>names[x.r])}};
+const read=(r,kind)=>{
+ const pin=pins.find(p=>p.dataset.region===r);
+ const col=pin?.querySelector(kind==='pm'?'.pin-dual>span:first-child b':'.pin-dual>span:last-child b');
+ const raw=col?.textContent?.trim();
+ if(raw&&raw!=='—'&&Number.isFinite(Number(raw)))return Number(raw);
+ const card=[...document.querySelectorAll('.dual-region-card,.regional-card')].find(el=>el.dataset.region===r);
+ const fallback=card?.querySelector(kind==='pm'?'.reading-pm b':'.reading-psi b');
+ const value=fallback?.textContent?.trim();
+ return value&&value!=='—'&&Number.isFinite(Number(value))?Number(value):null;
+};
+const best=kind=>{const a=regions.map(r=>({r,v:kind==='psi'&&Number.isFinite(psi[r])?psi[r]:read(r,kind)})).filter(x=>Number.isFinite(x.v));if(!a.length)return null;const m=Math.max(...a.map(x=>x.v));return {v:m,regions:a.filter(x=>x.v===m).map(x=>names[x.r])}};
 const p=best('psi'),m=best('pm');
 set('smart-max-psi',p?p.v+' · '+p.regions.join(', '):'Unavailable');
 set('smart-max-pm',m?m.v+' µg/m³ · '+m.regions.join(', '):'Unavailable');
 set('smart-condition',!p?'Unavailable':p.v<=100?'Good to Moderate':p.v<=200?'Unhealthy':p.v<=300?'Very Unhealthy':'Hazardous');
 const status=document.getElementById('mapFeedStatus')?.textContent||'';
 const timestamp=document.getElementById('mapUpdated')?.textContent||'';
-const saved=/saved|cached/i.test(status+timestamp),unavailable=/unavailable/i.test(status);
-set('smart-freshness',unavailable?'Unavailable':saved?'Saved / not live':/live/i.test(status)?'Live response':'Checking');
-set('smart-updated',timestamp||'Awaiting NEA update timestamp');
+const saved=/saved|cached|stale/i.test(status+timestamp),unavailable=/unavailable/i.test(status);
+set('smart-freshness',unavailable?'Unavailable':saved?'Saved / not live':/live/i.test(status)?'Live response':(p||m)?'Readings shown; freshness unverified':'Checking');
+set('smart-updated',timestamp||'NEA timestamp unavailable');
 }
-update();setInterval(update,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
+update();setInterval(update,5000);document.addEventListener('hccc-psi-updated',update);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
 })();
 </script></body></html>
