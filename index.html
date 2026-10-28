@@ -483,4 +483,37 @@ loadWeatherOutlook();setInterval(loadWeatherOutlook,30*60*1000);
  document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
  document.addEventListener('click',e=>{if(!panel.hidden&&!panel.contains(e.target)&&!more?.contains(e.target))close()});
 })();
-</script></body></html>
+</script><script id="map-at-a-glance-layout">
+(function(){
+ function arrange(){
+  const section=document.getElementById('map'),panel=section?.querySelector('.hybrid-map');
+  const map=panel?.querySelector('.v47-map'),highlight=panel?.querySelector('#mapPsiHighlight');
+  if(!panel||!map||!highlight)return;
+  const heading=section.querySelector('h2');
+  if(heading)heading.textContent='Singapore air quality at a glance';
+  const subtitle=section.querySelector(':scope > p.muted');
+  if(subtitle)subtitle.hidden=true;
+  panel.insertBefore(highlight,panel.firstElementChild);
+  highlight.after(map);
+  const controls=panel.querySelector('.air-map-toggle');
+  if(controls)map.after(controls);
+  const help=panel.querySelector('#mapModeHelp');
+  if(help)help.hidden=true;
+  const explainer=panel.querySelector('.map-highest-explainer');
+  if(explainer)explainer.hidden=true;
+  const title=panel.querySelector('.hybrid-heading');
+  if(title)title.classList.add('compact-map-secondary');
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arrange,{once:true});else arrange();
+})();
+</script><style id="map-at-a-glance-css">
+@media(max-width:700px){
+ #map>h2{font-size:clamp(1.3rem,5.4vw,1.8rem);margin:8px 0 12px}
+ #map .hybrid-map{padding:12px!important}
+ #map .map-psi-highlight{margin:2px 0 12px!important;font-size:clamp(.85rem,3.5vw,1rem);max-width:100%;box-sizing:border-box}
+ #map .v47-map{margin:0 0 12px!important}
+ #map .compact-map-secondary{margin-top:12px}
+ #map .map-topline{margin-top:12px}
+ #map .air-map-toggle{margin:0 0 8px}
+}
+</style></body></html>
