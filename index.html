@@ -516,4 +516,12 @@ loadWeatherOutlook();setInterval(loadWeatherOutlook,30*60*1000);
  #map .map-topline{margin-top:12px}
  #map .air-map-toggle{margin:0 0 8px}
 }
+</style><style id="mobile-navigation-clearance-v2">
+@media(max-width:700px){
+ html{scroll-padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+ body{padding-bottom:calc(135px + env(safe-area-inset-bottom))!important}
+ main{padding-bottom:calc(145px + env(safe-area-inset-bottom))!important}
+ #top,#map,#trends,#advisory-panel,#more-links{scroll-margin-bottom:calc(130px + env(safe-area-inset-bottom))}
+ .mobile-bottom-nav{min-height:74px}
+}
 </style></body></html>
