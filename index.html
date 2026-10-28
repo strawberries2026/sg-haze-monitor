@@ -536,4 +536,34 @@ loadWeatherOutlook();setInterval(loadWeatherOutlook,30*60*1000);
  #top,#map,#trends,#advisory-panel,#more-links{scroll-margin-bottom:calc(130px + env(safe-area-inset-bottom))}
  .mobile-bottom-nav{min-height:74px}
 }
-</style></body></html>
+</style><style id="smart-summary-phase1-style">
+.smart-summary{margin:12px 0 16px;padding:14px;border:1px solid #52788b;border-radius:17px;background:#102b3e;color:#eaf5ff}
+.smart-summary h3{margin:0 0 10px;font-size:18px}.smart-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.smart-summary-grid article{border:1px solid #426a80;border-radius:12px;padding:10px;background:#18394c;min-width:0}
+.smart-summary-grid small{display:block;color:#bdd5e4;font-size:12px}.smart-summary-grid strong{display:block;font-size:17px;margin-top:5px;overflow-wrap:anywhere}
+.smart-summary-footer{font-size:12px;line-height:1.5;margin-top:10px;color:#c6dce9}.smart-summary-footer a{color:#9ee5e9}
+</style><script id="smart-summary-phase1-script">
+(function(){
+const panel=document.querySelector('.hybrid-map'),map=panel?.querySelector('.v47-map');if(!panel||!map)return;
+const box=document.createElement('section');box.className='smart-summary';box.setAttribute('aria-label','Smart air quality summary');
+box.innerHTML='<h3>Air quality snapshot</h3><div class="smart-summary-grid"><article><small>Highest 24-hour PSI</small><strong id="smart-max-psi">Checking…</strong></article><article><small>Highest 1-hour PM2.5</small><strong id="smart-max-pm">Checking…</strong></article><article><small>PSI conditions</small><strong id="smart-condition">Checking…</strong></article><article><small>Data freshness</small><strong id="smart-freshness">Checking…</strong></article></div><div class="smart-summary-footer"><span id="smart-updated">Awaiting verified readings.</span> · <a href="https://www.haze.gov.sg/" target="_blank" rel="noopener noreferrer">Official NEA haze outlook ↗</a><br>Forecast is available from NEA when published; it is not calculated from current readings.</div>';
+map.before(box);
+const names={north:'North',south:'South',east:'East',west:'West',central:'Central'},regions=Object.keys(names);
+const set=(id,value)=>{const el=document.getElementById(id);if(el&&el.textContent!==value)el.textContent=value};
+function update(){
+const state=window.hcccPsiAlertState||{},psi=state.values||{},pins=[...document.querySelectorAll('.v47-pin')];
+const read=(r,kind)=>{const pin=pins.find(p=>p.dataset.region===r);if(!pin)return null;const col=pin.querySelector(kind==='pm'?'.pin-dual>span:first-child b':'.pin-dual>span:last-child b');const n=Number(col?.textContent?.trim());return col&&col.textContent.trim()!=='—'&&Number.isFinite(n)?n:null};
+const best=(kind)=>{const a=regions.map(r=>({r,v:kind==='psi'&&Number.isFinite(psi[r])?psi[r]:read(r,kind)})).filter(x=>Number.isFinite(x.v));if(!a.length)return null;const m=Math.max(...a.map(x=>x.v));return {v:m,regions:a.filter(x=>x.v===m).map(x=>names[x.r])}};
+const p=best('psi'),m=best('pm');
+set('smart-max-psi',p?p.v+' · '+p.regions.join(', '):'Unavailable');
+set('smart-max-pm',m?m.v+' µg/m³ · '+m.regions.join(', '):'Unavailable');
+set('smart-condition',!p?'Unavailable':p.v<=100?'Good to Moderate':p.v<=200?'Unhealthy':p.v<=300?'Very Unhealthy':'Hazardous');
+const status=document.getElementById('mapFeedStatus')?.textContent||'';
+const timestamp=document.getElementById('mapUpdated')?.textContent||'';
+const saved=/saved|cached/i.test(status+timestamp),unavailable=/unavailable/i.test(status);
+set('smart-freshness',unavailable?'Unavailable':saved?'Saved / not live':/live/i.test(status)?'Live response':'Checking');
+set('smart-updated',timestamp||'Awaiting NEA update timestamp');
+}
+update();setInterval(update,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
+})();
+</script></body></html>
