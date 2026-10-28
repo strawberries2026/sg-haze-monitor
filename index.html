@@ -566,4 +566,18 @@ set('smart-updated',timestamp||'Awaiting NEA update timestamp');
 }
 update();setInterval(update,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
 })();
-</script></body></html>
+</script><style id="v54-mobile-ux">
+@media(max-width:700px){
+.hybrid-map{padding:12px!important}
+.smart-summary{padding:11px;margin:10px 0 12px}
+.smart-summary-grid{gap:7px}
+.smart-summary-grid article{padding:9px}
+.smart-summary-grid strong{font-size:15px}
+.v47-map{height:clamp(260px,75vw,420px)}
+.v47-pin{min-width:0;min-height:0;padding:5px 7px}
+.v47-pin span{font-size:11px}
+.v47-pin b{font-size:19px}
+.mobile-bottom-nav{gap:5px}
+}
+@media(max-width:380px){.v47-pin{padding:4px 5px}.v47-pin b{font-size:17px}.v47-pin span{font-size:10px}}
+</style></body></html>
