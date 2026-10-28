@@ -566,4 +566,32 @@ set('smart-updated',timestamp||'Awaiting NEA update timestamp');
 }
 update();setInterval(update,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
 })();
+</script><style id="outdoor-advisory-v55-style">
+.outdoor-advisory{margin:12px 0;padding:13px 15px;border:1px solid #54778a;border-left:5px solid #91afc0;border-radius:14px;background:#112f40;color:#eaf5ff}
+.outdoor-advisory h3{font-size:17px;margin:0 0 6px}.outdoor-advisory p{margin:6px 0;line-height:1.45;font-size:14px}
+.outdoor-advisory small{color:#bcd6e3;line-height:1.4;display:block}
+</style><script id="outdoor-advisory-v55-script">
+(function(){
+const panel=document.querySelector('.hybrid-map'),summary=panel?.querySelector('.smart-summary');if(!panel||!summary)return;
+const box=document.createElement('section');box.className='outdoor-advisory';box.setAttribute('aria-label','Outdoor activity guidance');box.setAttribute('role','status');
+box.innerHTML='<h3>Outdoor activity guidance</h3><p id="outdoor-guidance">Checking verified 24-hour PSI readings…</p><small>General guidance based on the highest available 24-hour PSI across five regions, not a personal medical recommendation. Check NEA advisories for sensitive groups and latest updates.</small>';
+summary.after(box);
+const message=document.getElementById('outdoor-guidance');
+function update(){
+const state=window.hcccPsiAlertState||{},values=state.values||{},regions=['north','south','east','west','central'];
+const pins=[...document.querySelectorAll('.v47-pin')];
+const readings=regions.map(r=>{const n=Number(values[r]);if(values[r]!==undefined&&values[r]!==null&&values[r]!==''&&Number.isFinite(n))return n;
+const pin=pins.find(p=>p.dataset.region===r),col=pin?.querySelector('.pin-dual>span:last-child b');const v=col?.textContent?.trim();return v&&v!=='—'&&Number.isFinite(Number(v))?Number(v):null;}).filter(v=>v!==null);
+const timestamp=document.getElementById('mapUpdated')?.textContent||'',status=document.getElementById('mapFeedStatus')?.textContent||'';
+if(!readings.length||/unavailable/i.test(status)){message.textContent='Verified PSI readings unavailable. Check NEA before planning outdoor activities.';box.style.borderLeftColor='#91afc0';return;}
+const max=Math.max(...readings);let advice,color;
+if(max<=100){advice='Generally suitable for normal outdoor activities. People who are sensitive to air pollution should monitor symptoms.';color='#28b86b';}
+else if(max<=200){advice='Reduce prolonged or strenuous outdoor activity, particularly for children, older adults and people with heart or lung conditions. Follow official NEA health advice.';color='#ffcf33';}
+else if(max<=300){advice='Minimise outdoor activities; avoid prolonged or strenuous outdoor exertion. Check NEA guidance for vulnerable groups.';color='#ff972e';}
+else{advice='Avoid outdoor activities where possible and follow official NEA public health advisories.';color='#f04c64';}
+const freshness=/saved|cached|stale/i.test(status+' '+timestamp)?' (saved reading; verify current conditions)':'';
+message.textContent='Highest available 24-hour PSI: '+max+freshness+'. '+advice;box.style.borderLeftColor=color;
+}
+update();setInterval(update,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
+})();
 </script></body></html>
