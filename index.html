@@ -466,7 +466,7 @@ loadWeatherOutlook();setInterval(loadWeatherOutlook,30*60*1000);
  const label=document.getElementById('mapPsiHighlight');if(!label)return;
  const regions=['north','west','central','east','south'];
  function update(){const state=window.hcccPsiAlertState||{},values=state.values||{};const valid=regions.filter(r=>Number.isFinite(values[r]));if(!valid.length){label.textContent='★ Highest 24-hour PSI: unavailable';return}const max=Math.max(...valid.map(r=>values[r]));const winners=valid.filter(r=>values[r]===max).map(r=>r[0].toUpperCase()+r.slice(1));const status=document.getElementById('mapFeedStatus')?.textContent||'';const saved=/saved|not live|cached/i.test(status);const live=/live NEA PSI response/i.test(status)&&!saved;label.textContent='★ Highest 24-hour PSI: '+max+' — '+winners.join(' & ')+(live?'':' (not confirmed live)')}
- document.addEventListener('hccc-psi-updated',update);update();
+ document.addEventListener('hccc-psi-updated',update);const feed=document.getElementById('mapFeedStatus');if(feed)new MutationObserver(update).observe(feed,{childList:true,subtree:true,characterData:true});update();
 })();
 </script><style id="mobile-ux-consolidation-v1">
 .regional-card-details{margin:12px 0}.regional-card-details>summary{cursor:pointer;border:1px solid #52768b;border-radius:12px;padding:11px 13px;font-weight:750;color:#d7eef5}.regional-card-details[open]>summary{margin-bottom:12px}
