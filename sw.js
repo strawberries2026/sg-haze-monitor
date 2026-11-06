@@ -1,5 +1,5 @@
 /* SG Haze Monitor: same-origin app shell cache only. Live data is always network-first in page code. */
-const CACHE='sg-haze-shell-v20261107';
+const CACHE='sg-haze-shell-v1-1-0-20261107';
 const ASSETS=['./','./index.html','./satellite.html','./intelligence.html','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(async cache=>{await Promise.allSettled(ASSETS.map(async path=>{const response=await fetch(new Request(path,{cache:'reload'}));if(response.ok)await cache.put(path,response)}))}));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(key=>key.startsWith('sg-haze-shell-')&&key!==CACHE).map(key=>caches.delete(key)));await self.clients.claim()})())});
