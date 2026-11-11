@@ -37,3 +37,21 @@ for (const anchor of html.matchAll(/<a\b[^>]*target="_blank"[^>]*>/gi)) {
 assert.doesNotMatch(html, /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9_]{20,}|AIza[0-9A-Za-z_-]{25,}/, 'Possible embedded credential in HTML');
 assert.doesNotMatch(html, /\beval\s*\(|\bnew\s+Function\s*\(/, 'Dynamic code execution is not permitted');
 console.log('PASS: referrer policy, external links and basic frontend security checks');
+
+
+// Satellite fire overlay regression checks (offline; not a live NASA endpoint test).
+const satellite=fs.readFileSync('satellite.html','utf8');
+for (const id of ['sat-map','sat-date','fire-overlay-toggle','fire-overlay-refresh','fire-overlay-status']) {
+  assert.ok(satellite.includes('id="'+id+'"'), 'Missing satellite control: '+id);
+}
+assert.match(satellite, /VIIRS_SNPP_Thermal_Anomalies_375m_All/, 'NASA VIIRS layer identifier missing');
+assert.match(satellite, /gibs\.earthdata\.nasa\.gov\/wms\/epsg3857\/best\/wms\.cgi/, 'NASA WMS endpoint missing');
+assert.match(satellite, /L\.tileLayer\.wms/, 'Leaflet WMS layer missing');
+assert.match(satellite, /time:date/, 'Fire layer must follow selected date');
+assert.match(satellite, /thermal anomal|thermal-anomal|detections are not confirmed fires/i, 'Fire detection disclaimer missing');
+assert.match(satellite, /tileerror/, 'Satellite fire layer must handle tile errors');
+assert.match(satellite, /getDate\(\)/, 'Fire layer date control missing');
+for (const script of satellite.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
+  if (script[1].trim()) new (require('node:vm').Script)(script[1],{filename:'satellite-inline.js'});
+}
+console.log('PASS: satellite fire overlay structure and inline script syntax (offline)');
