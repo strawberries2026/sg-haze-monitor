@@ -567,6 +567,13 @@ loadWeatherOutlook();setInterval(loadWeatherOutlook,30*60*1000);
  #top,#map,#trends,#advisory-panel,#more-links{scroll-margin-bottom:calc(130px + env(safe-area-inset-bottom))}
  .mobile-bottom-nav{min-height:74px}
 }
+</style><style id="mobile-footer-gap-fix">
+/* Avoid stacking body and main bottom padding beneath the fixed navigation. */
+@media(max-width:700px){
+ body{padding-bottom:0!important}
+ main{padding-bottom:calc(94px + env(safe-area-inset-bottom))!important}
+ html{scroll-padding-bottom:calc(95px + env(safe-area-inset-bottom))}
+}
 </style><style id="smart-summary-phase1-style">
 .smart-summary{margin:12px 0 16px;padding:14px;border:1px solid #52788b;border-radius:17px;background:#102b3e;color:#eaf5ff}
 .smart-summary h3{margin:0 0 10px;font-size:18px}.smart-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
