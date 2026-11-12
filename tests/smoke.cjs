@@ -37,3 +37,19 @@ for (const anchor of html.matchAll(/<a\b[^>]*target="_blank"[^>]*>/gi)) {
 assert.doesNotMatch(html, /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9_]{20,}|AIza[0-9A-Za-z_-]{25,}/, 'Possible embedded credential in HTML');
 assert.doesNotMatch(html, /\beval\s*\(|\bnew\s+Function\s*\(/, 'Dynamic code execution is not permitted');
 console.log('PASS: referrer policy, external links and basic frontend security checks');
+
+
+// Satellite map fallback regression checks (offline).
+const satellite=fs.readFileSync('satellite.html','utf8');
+for (const id of ['sat-map','sat-date','fire-overlay-panel']) {
+  assert.ok(satellite.includes('id="'+id+'"'), 'Missing satellite component: '+id);
+}
+assert.match(satellite, /firms\.modaps\.eosdis\.nasa\.gov\/map\//, 'Official NASA FIRMS fallback missing');
+assert.match(satellite, /asmc\.asean\.org/, 'ASMC regional fallback missing');
+assert.match(satellite, /temporarily disabled/i, 'Fire overlay suspension notice missing');
+assert.doesNotMatch(satellite, /id="fire-overlay-toggle"/, 'Broken fire overlay must remain disabled');
+assert.doesNotMatch(satellite, /L\.tileLayer\.wms\(/, 'Broken fire WMS requests must remain disabled');
+for (const script of satellite.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
+  if (script[1].trim()) new (require('node:vm').Script)(script[1],{filename:'satellite-inline.js'});
+}
+console.log('PASS: satellite fallback, disabled fire overlay and inline syntax (offline)');
