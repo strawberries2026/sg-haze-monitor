@@ -1,0 +1,32 @@
+name: Android PR preview package
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'manifest.json'
+      - 'service-worker.js'
+      - 'sw.js'
+      - '.github/workflows/android-pr-preview.yml'
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate app before packaging
+        run: node tests/smoke.cjs
+      - name: Prepare static preview
+        run: |
+          mkdir -p preview
+          git archive HEAD | tar -x -C preview
+          rm -rf preview/.github preview/tests
+          printf '%s\n' 'PR preview package. Open index.html in a browser. Some live APIs and PWA features may require HTTPS hosting; this ZIP is not a hosted preview.' > preview/PREVIEW-NOTES.txt
+      - name: Upload Android review package
+        uses: actions/upload-artifact@v4
+        with:
+          name: sg-haze-monitor-pr-preview
+          path: preview/
+          retention-days: 7
+          if-no-files-found: error
