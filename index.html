@@ -181,7 +181,7 @@ function updateActivityPlanner(){
  const v=when==='now'?currentPm?.[region]:null;
  const groupNames={healthy:'Generally healthy adults',vulnerable:'Children, older adults or pregnant people',medical:'People with heart or lung conditions'};
  const audience=groupNames[group]||groupNames.healthy;
- const prefix='<div style="font-size:13px;color:#b8d8e8;margin-bottom:10px"><strong>Planning:</strong> '+(when==='now'?'Now / next hour':'Tomorrow / next day')+' · <strong>Participants:</strong> '+audience+'</div>';
+ const prefix='<div style="font-size:13px;color:#b8d8e8;margin-bottom:10px"><strong>Planning:</strong> '+(when==='now'?'Now / next hour':'Tomorrow / next day')+' · <strong>Participants:</strong> '+audience+' · <strong>Region:</strong> '+names[region]+'</div>';
  let message='',heading='';
  if(when==='tomorrow'){
   heading='Next-day planning: official PSI forecast required';
@@ -201,7 +201,9 @@ function updateActivityPlanner(){
   };
   message=verified?guidance[group][band]+' This is guidance based on a recently retrieved reading, not a prediction. Recheck before starting.':'Saved or outdated reading only ('+(lastPmTimestamp?new Date(lastPmTimestamp).toLocaleString('en-SG',{timeZone:'Asia/Singapore'}):'timestamp unavailable')+'). Do not use this value for current outdoor activity decisions; check official NEA readings before going out.';
  }
- document.getElementById('activityResult').innerHTML=prefix+'<strong>'+heading+'</strong><p>'+message+'</p>';
+ const result=document.getElementById('activityResult');
+ result.innerHTML=prefix+'<strong>'+heading+'</strong><p>'+message+'</p>';
+ result.setAttribute('role','status');
 }
 document.getElementById('activityWhen').addEventListener('change',updateActivityPlanner);document.getElementById('activityGroup').addEventListener('change',updateActivityPlanner);document.getElementById('focusRegion').addEventListener('change',updateActivityPlanner);setInterval(updateActivityPlanner,60000);
 
@@ -224,7 +226,7 @@ function showDatedPsiForecast(){
  if(today===forecastDate){
   el.textContent='NEA published PSI forecast for 24 Oct 2026: '+min+'–'+max+' (Moderate to Unhealthy). Dated published forecast, not a live API reading. Confirm updates on haze.gov.sg.';
  }else{
-  el.textContent='No verified current next-day PSI forecast is connected. The previously published 24 Oct 2026 forecast was 90–140 and is now historical. Check haze.gov.sg for the latest dated forecast.';
+  el.textContent='No verified current next-day PSI forecast is connected. Check haze.gov.sg for the latest dated official forecast. Historical forecasts must not be used for current planning.';
  }
 }
 function refreshDatedPsiForecastDisplay(){
