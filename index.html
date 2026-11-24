@@ -648,21 +648,11 @@ map.before(box);
 const names={north:'North',south:'South',east:'East',west:'West',central:'Central'},regions=Object.keys(names);
 const set=(id,value)=>{const el=document.getElementById(id);if(el&&el.textContent!==value)el.textContent=value};
 function update(){
-const state=window.hcccPsiAlertState||{},psi=state.values||{},pins=[...document.querySelectorAll('.v47-pin')];
-const read=(r,kind)=>{
- const pin=pins.find(p=>p.dataset.region===r);
- const col=pin?.querySelector(kind==='pm'?'.pin-dual>span:first-child b':'.pin-dual>span:last-child b');
- const raw=col?.textContent?.trim();
- if(raw&&raw!=='—'&&Number.isFinite(Number(raw)))return Number(raw);
- const card=[...document.querySelectorAll('.dual-region-card,.regional-card')].find(el=>el.dataset.region===r);
- const fallback=card?.querySelector(kind==='pm'?'.reading-pm b':'.reading-psi b');
- const value=fallback?.textContent?.trim();
- return value&&value!=='—'&&Number.isFinite(Number(value))?Number(value):null;
-};
-const best=kind=>{const a=regions.map(r=>({r,v:kind==='psi'&&Number.isFinite(psi[r])?psi[r]:read(r,kind)})).filter(x=>Number.isFinite(x.v));if(!a.length)return null;const m=Math.max(...a.map(x=>x.v));return {v:m,regions:a.filter(x=>x.v===m).map(x=>names[x.r])}};
+const state=window.hcccPsiAlertState||{},pmState=window.hcccPmFeedState||{};
+const best=kind=>{const values=(kind==='psi'?state:pmState).values||{};const a=regions.map(r=>({r,v:values[r]})).filter(x=>Number.isFinite(x.v)&&x.v>=0);if(!a.length)return null;const m=Math.max(...a.map(x=>x.v));return {v:m,regions:a.filter(x=>x.v===m).map(x=>names[x.r])}};
 const p=best('psi'),m=best('pm');
 set('smart-max-psi',p?p.v+' · '+p.regions.join(', '):'Unavailable');
-set('smart-max-pm',m?m.v+' µg/m³ · '+m.regions.join(', '):'Unavailable');
+set('smart-max-pm',m?m.v+' µg/m³ · '+m.regions.join(', ')+(pmState.live?'':pmState.cached?' (Saved / not live)':' (Freshness unverified)'):'Unavailable');
 set('smart-condition',!p?'Unavailable':p.v<=100?'Good to Moderate':p.v<=200?'Unhealthy':p.v<=300?'Very Unhealthy':'Hazardous');
 const status=document.getElementById('mapFeedStatus')?.textContent||'';
 const timestamp=document.getElementById('mapUpdated')?.textContent||'';
@@ -670,7 +660,7 @@ const saved=/saved|cached|stale/i.test(status+timestamp),unavailable=/unavailabl
 set('smart-freshness',unavailable?'Unavailable':saved?'Saved / not live':/live/i.test(status)?'Live response':(p||m)?'Readings shown; freshness unverified':'Checking');
 set('smart-updated',timestamp||'NEA timestamp unavailable');
 }
-update();setInterval(update,5000);document.addEventListener('hccc-psi-updated',update);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
+update();setInterval(update,5000);document.addEventListener('hccc-psi-updated',update);document.addEventListener('hccc-pm-updated',update);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
 })();
 </script><script id="professional-data-health-script">
 (()=>{'use strict';const $=id=>document.getElementById(id),set=(id,s)=>{const el=$(id);if(el)el.textContent=s};let prior='';function update(){const status=$('mapFeedStatus')?.textContent?.trim()||'',observed=$('mapUpdated')?.textContent?.trim()||'';set('health-feed',status||'Unavailable');const issue=window.hcccPsiAlertState?.error;const pmIssue=window.hcccPmFeedState?.error;set('health-error',[issue?'PSI: '+issue:'PSI: no request error',pmIssue?'PM2.5: '+pmIssue:'PM2.5: no request error'].join(' · '));const psi=window.hcccPsiAlertState,pm=window.hcccPmFeedState;const stateLabel=(v)=>!v?'Checking':v.live?'Live':v.cached?'Saved':'Unavailable';const psiLabel=stateLabel(psi),pmLabel=stateLabel(pm);const overall=psiLabel==='Live'&&pmLabel==='Live'?'Both feeds live':psiLabel==='Live'||pmLabel==='Live'?'Partial live data':psiLabel==='Saved'||pmLabel==='Saved'?'Saved data · not live':psiLabel==='Checking'||pmLabel==='Checking'?'Checking feeds':'Feeds unavailable';set('health-summary',overall+' · details');set('health-feed','PSI: '+psiLabel+' · PM2.5: '+pmLabel);const showTime=(v)=>{if(!v?.timestamp)return 'unavailable';const d=new Date(v.timestamp);return Number.isFinite(d.getTime())?d.toLocaleString('en-SG',{timeZone:'Asia/Singapore',day:'2-digit',month:'short',year:'numeric',hour:'numeric',minute:'2-digit'}):'unavailable'};set('health-observed','PSI: '+showTime(psi)+' · PM2.5: '+showTime(pm));const bad=/unavailable|error|failed/i.test(status),cached=/cached|saved|stale|not live/i.test(status+' '+observed),live=/live/i.test(status)&&!cached&&!bad;set('health-confidence',overall);const pair=overall+'|'+observed;if(pair!==prior){prior=pair;if(!/checking|loading/i.test(pair))set('health-checked',new Date().toLocaleTimeString())}}
