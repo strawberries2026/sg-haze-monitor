@@ -86,3 +86,7 @@ assert.match(html,/Singapore-wide air quality snapshot/);
 assert.match(html,/smart-selected-region/);
 assert.match(html,/feed\.values\?\.\[selected\]/);
 assert.match(html,/getElementById\('focusRegion'\)\?\.addEventListener\('change',update\)/);
+
+assert.match(html,/\.v47-pin\.highest-psi-pin:not\(\.active\)\{outline:none!important/);
+assert.match(html,/\.v47-pin\.active\{outline:3px solid #fff/);
+assert.doesNotMatch(html,/\.v47-pin\.highest-psi-pin\{outline:none!important/);
