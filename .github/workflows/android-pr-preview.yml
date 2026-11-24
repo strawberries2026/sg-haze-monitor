@@ -4,8 +4,8 @@ on:
     branches: [main]
     paths:
       - 'index.html'
-      - 'manifest.json'
-      - 'service-worker.js'
+      - 'manifest.webmanifest'
+      - 'tests/smoke.cjs'
       - 'sw.js'
       - '.github/workflows/android-pr-preview.yml'
 permissions:
