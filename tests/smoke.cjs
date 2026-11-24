@@ -53,3 +53,31 @@ for (const script of satellite.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)
   if (script[1].trim()) new (require('node:vm').Script)(script[1],{filename:'satellite-inline.js'});
 }
 console.log('PASS: satellite fallback, disabled fire overlay and inline syntax (offline)');
+
+// Release metadata and planner safeguards.
+const version=html.match(/<meta name="sg-app-version" content="([^"]+)">/)[1];
+const releaseDate=html.match(/<meta name="sg-app-release-date" content="([^"]+)">/)[1];
+assert.ok(html.includes('Version '+version+' · Release date: '+releaseDate));
+const sw=fs.readFileSync('sw.js','utf8');
+new vm.Script(sw);
+assert.ok(sw.includes("sg-haze-shell-v"+version+"-nav5-pm1'"));
+assert.match(html, /Historical forecasts must not be used for current planning/);
+assert.match(html, /result\.setAttribute\('role','status'\)/);
+assert.match(html, /<strong>Region:<\/strong>/);
+console.log('PASS: release metadata, cache version and planner safeguards');
+
+assert.match(html,/id="mobile-nav-dock-v5"/);
+assert.match(html,/inset:auto 0 0/);
+assert.match(html,/document\.body\.appendChild\(nav\)/);
+assert.match(html,/env\(safe-area-inset-bottom,0px\)/);
+assert.match(html,/var\(--haze-nav-height,80px\)/);
+console.log('PASS: mobile viewport anchoring and safe-area source safeguards');
+
+assert.match(html,/inset:auto 0 0;margin:0!important/);
+
+const summaryScript=html.match(/<script id="smart-summary-phase1-script">([\s\S]*?)<\/script>/)[1];
+assert.match(summaryScript,/hcccPmFeedState/);
+assert.match(summaryScript,/hccc-pm-updated/);
+assert.doesNotMatch(summaryScript,/pin-dual/);
+assert.match(summaryScript,/Saved \/ not live/);
+console.log('PASS: snapshot shared feed source safeguards');
