@@ -677,4 +677,19 @@ update();setInterval(update,5000);document.addEventListener('hccc-psi-updated',u
 update();document.addEventListener('hccc-psi-updated',update);setInterval(update,5000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()})})();
 </script><script id="pwa-register-v1">
 if('serviceWorker' in navigator&&location.protocol==='https:'){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(error=>console.warn('Optional offline shell unavailable:',error))})}
+</script><style id="mobile-nav-viewport-v3">
+@media(max-width:700px){
+ html{scroll-padding-bottom:var(--haze-nav-height,80px)}
+ body{padding-bottom:0!important}
+ main{padding-bottom:calc(var(--haze-nav-height,80px) + 16px)!important}
+ .mobile-bottom-nav{position:fixed;bottom:auto;top:var(--haze-nav-top,auto);left:0;right:0;box-sizing:border-box;min-height:0;padding:5px 6px calc(5px + env(safe-area-inset-bottom,0px));background:#102638}
+ .mobile-bottom-nav:not([data-viewport-ready]){top:auto;bottom:0}
+ .mobile-more-panel[open]{bottom:calc(var(--haze-nav-height,80px) + var(--haze-viewport-gap,0px) + 8px)}
+}
+</style><script id="mobile-nav-viewport-script">
+(()=>{const nav=document.querySelector('.mobile-bottom-nav');if(!nav)return;document.body.appendChild(nav);const root=document.documentElement,v=window.visualViewport;let frame=0;
+function sync(){frame=0;if(!matchMedia('(max-width:700px)').matches)return;const h=nav.getBoundingClientRect().height;if(!h)return;const bottom=v?v.offsetTop+v.height:window.innerHeight;root.style.setProperty('--haze-nav-height',h+'px');root.style.setProperty('--haze-nav-top',Math.max(0,bottom-h)+'px');root.style.setProperty('--haze-viewport-gap',Math.max(0,window.innerHeight-bottom)+'px');nav.dataset.viewportReady='true'}
+function schedule(){if(!frame)frame=requestAnimationFrame(sync)}
+window.addEventListener('resize',schedule);window.addEventListener('pageshow',schedule);v?.addEventListener('resize',schedule);v?.addEventListener('scroll',schedule);if('ResizeObserver'in window)new ResizeObserver(schedule).observe(nav);schedule();
+})();
 </script></body></html>
