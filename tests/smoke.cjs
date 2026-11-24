@@ -81,3 +81,8 @@ assert.match(summaryScript,/hccc-pm-updated/);
 assert.doesNotMatch(summaryScript,/pin-dual/);
 assert.match(summaryScript,/Saved \/ not live/);
 console.log('PASS: snapshot shared feed source safeguards');
+
+assert.match(html,/Singapore-wide air quality snapshot/);
+assert.match(html,/smart-selected-region/);
+assert.match(html,/feed\.values\?\.\[selected\]/);
+assert.match(html,/getElementById\('focusRegion'\)\?\.addEventListener\('change',update\)/);
