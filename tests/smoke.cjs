@@ -60,7 +60,7 @@ const releaseDate=html.match(/<meta name="sg-app-release-date" content="([^"]+)"
 assert.ok(html.includes('Version '+version+' · Release date: '+releaseDate));
 const sw=fs.readFileSync('sw.js','utf8');
 new vm.Script(sw);
-assert.ok(sw.includes("sg-haze-shell-v"+version+"-nav5-pm1'"));
+assert.ok(sw.includes("sg-haze-shell-v"+version+"-nav5-region1'"));
 assert.match(html, /Historical forecasts must not be used for current planning/);
 assert.match(html, /result\.setAttribute\('role','status'\)/);
 assert.match(html, /<strong>Region:<\/strong>/);
@@ -81,3 +81,12 @@ assert.match(summaryScript,/hccc-pm-updated/);
 assert.doesNotMatch(summaryScript,/pin-dual/);
 assert.match(summaryScript,/Saved \/ not live/);
 console.log('PASS: snapshot shared feed source safeguards');
+
+assert.match(html,/Singapore-wide air quality snapshot/);
+assert.match(html,/smart-selected-region/);
+assert.match(html,/feed\.values\?\.\[selected\]/);
+assert.match(html,/getElementById\('focusRegion'\)\?\.addEventListener\('change',update\)/);
+
+assert.match(html,/\.v47-pin\.highest-psi-pin:not\(\.active\)\{outline:none!important/);
+assert.match(html,/\.v47-pin\.active\{outline:3px solid #fff/);
+assert.doesNotMatch(html,/\.v47-pin\.highest-psi-pin\{outline:none!important/);
