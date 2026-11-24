@@ -53,3 +53,15 @@ for (const script of satellite.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)
   if (script[1].trim()) new (require('node:vm').Script)(script[1],{filename:'satellite-inline.js'});
 }
 console.log('PASS: satellite fallback, disabled fire overlay and inline syntax (offline)');
+
+// Release metadata and planner safeguards.
+const version=html.match(/<meta name="sg-app-version" content="([^"]+)">/)[1];
+const releaseDate=html.match(/<meta name="sg-app-release-date" content="([^"]+)">/)[1];
+assert.ok(html.includes('Version '+version+' · Release date: '+releaseDate));
+const sw=fs.readFileSync('sw.js','utf8');
+new vm.Script(sw);
+assert.ok(sw.includes("sg-haze-shell-v"+version+"'"));
+assert.match(html, /Historical forecasts must not be used for current planning/);
+assert.match(html, /result\.setAttribute\('role','status'\)/);
+assert.match(html, /<strong>Region:<\/strong>/);
+console.log('PASS: release metadata, cache version and planner safeguards');
