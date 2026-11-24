@@ -677,12 +677,12 @@ update();setInterval(update,5000);document.addEventListener('hccc-psi-updated',u
 update();document.addEventListener('hccc-psi-updated',update);setInterval(update,5000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()})})();
 </script><script id="pwa-register-v1">
 if('serviceWorker' in navigator&&location.protocol==='https:'){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(error=>console.warn('Optional offline shell unavailable:',error))})}
-</script><style id="mobile-nav-dock-v4">
+</script><style id="mobile-nav-dock-v5">
 @media(max-width:700px){
  html{scroll-padding-bottom:var(--haze-nav-height,80px)}
  body{padding-bottom:0!important}
  main{padding-bottom:calc(var(--haze-nav-height,80px) + 16px)!important}
- .mobile-bottom-nav{position:fixed;inset:auto 0 0;box-sizing:border-box;min-height:0;padding:5px 6px calc(5px + env(safe-area-inset-bottom,0px));background:#102638}
+ .mobile-bottom-nav{position:fixed;inset:auto 0 0;margin:0!important;box-sizing:border-box;min-height:0;padding:5px 6px calc(5px + env(safe-area-inset-bottom,0px));background:#102638}
  .mobile-more-panel[open]{bottom:calc(var(--haze-nav-height,80px) + 8px)}
 }
 </style><script id="mobile-nav-dock-script">
