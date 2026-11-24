@@ -60,15 +60,17 @@ const releaseDate=html.match(/<meta name="sg-app-release-date" content="([^"]+)"
 assert.ok(html.includes('Version '+version+' · Release date: '+releaseDate));
 const sw=fs.readFileSync('sw.js','utf8');
 new vm.Script(sw);
-assert.ok(sw.includes("sg-haze-shell-v"+version+"-nav4'"));
+assert.ok(sw.includes("sg-haze-shell-v"+version+"-nav5'"));
 assert.match(html, /Historical forecasts must not be used for current planning/);
 assert.match(html, /result\.setAttribute\('role','status'\)/);
 assert.match(html, /<strong>Region:<\/strong>/);
 console.log('PASS: release metadata, cache version and planner safeguards');
 
-assert.match(html,/id="mobile-nav-dock-v4"/);
+assert.match(html,/id="mobile-nav-dock-v5"/);
 assert.match(html,/inset:auto 0 0/);
 assert.match(html,/document\.body\.appendChild\(nav\)/);
 assert.match(html,/env\(safe-area-inset-bottom,0px\)/);
 assert.match(html,/var\(--haze-nav-height,80px\)/);
 console.log('PASS: mobile viewport anchoring and safe-area source safeguards');
+
+assert.match(html,/inset:auto 0 0;margin:0!important/);
