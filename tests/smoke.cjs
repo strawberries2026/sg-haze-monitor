@@ -60,7 +60,7 @@ const releaseDate=html.match(/<meta name="sg-app-release-date" content="([^"]+)"
 assert.ok(html.includes('Version '+version+' · Release date: '+releaseDate));
 const sw=fs.readFileSync('sw.js','utf8');
 new vm.Script(sw);
-assert.ok(sw.includes("sg-haze-shell-v"+version+"-nav5-pm1'"));
+assert.ok(sw.includes("sg-haze-shell-v"+version+"-nav5-region1'"));
 assert.match(html, /Historical forecasts must not be used for current planning/);
 assert.match(html, /result\.setAttribute\('role','status'\)/);
 assert.match(html, /<strong>Region:<\/strong>/);
