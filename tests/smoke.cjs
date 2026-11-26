@@ -60,7 +60,7 @@ const releaseDate=html.match(/<meta name="sg-app-release-date" content="([^"]+)"
 assert.ok(html.includes('Version '+version+' · Release date: '+releaseDate));
 const sw=fs.readFileSync('sw.js','utf8');
 new vm.Script(sw);
-assert.ok(sw.includes("sg-haze-shell-v"+version+"-nav5-region1'"));
+assert.ok(sw.includes("sg-haze-shell-v"+version+"-nav5-region1-mask1'"));
 assert.match(html, /Historical forecasts must not be used for current planning/);
 assert.match(html, /result\.setAttribute\('role','status'\)/);
 assert.match(html, /<strong>Region:<\/strong>/);
@@ -90,3 +90,11 @@ assert.match(html,/getElementById\('focusRegion'\)\?\.addEventListener\('change'
 assert.match(html,/\.v47-pin\.highest-psi-pin:not\(\.active\)\{outline:none!important/);
 assert.match(html,/\.v47-pin\.active\{outline:3px solid #fff/);
 assert.doesNotMatch(html,/\.v47-pin\.highest-psi-pin\{outline:none!important/);
+
+// Mask resource maintenance safeguards.
+assert.ok(!html.includes('https://go.gov.sg/hazemask'), 'Expired locator must not return');
+assert.match(html, /Government mask collection status/);
+assert.match(html, /dated announcement, not a live collection status/);
+assert.ok(html.includes('https://www.nea.gov.sg/our-services/pollution-control/air-pollution/faqs'));
+assert.ok(html.includes('https://www.moh.gov.sg/others/haze/'));
+console.log('PASS: mask resource safeguards');
